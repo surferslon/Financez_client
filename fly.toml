@@ -1,0 +1,30 @@
+# Fly.io configuration. The entries are stored in SQLite on a volume, which belongs to one machine:
+# do not scale this app beyond a single machine.
+app = "financez-client"      # has to be unique on Fly, change it if taken
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[mounts]
+  source = "client_data"
+  destination = "/usr/app/data"
+
+[http_service]
+  internal_port = 8000
+  force_https = true              # passwords and password hashes only travel over TLS
+  auto_stop_machines = "suspend"  # sleep when unused; waking up is fast enough for the sync timeout
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    method = "GET"
+    path = "/login"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

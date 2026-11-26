@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Waiting for sync ({{ entries|length }})</h2>
+{% if not entries %}<p>Nothing is waiting.</p>{% endif %}
+<ul>
+    {% for entry in entries %}
+    <li>
+        <div>
+            <strong>{{ entry.total }} {{ currency_names.get(entry.currency, "?") }}</strong> · {{ entry.date }}<br>
+            {{ account_names.get(entry.acc_dr, "deleted account") }} ← {{ account_names.get(entry.acc_cr, "deleted account") }}
+            {% if entry.comment %}<br><small>{{ entry.comment }}</small>{% endif %}
+        </div>
+        <form method="post" action="{{ url_for('web.delete_entry', entry_id=entry.id) }}" onsubmit="return confirm('Delete this entry?')">
+            <input type="hidden" name="csrf" value="{{ session.csrf }}">
+            <button aria-label="Delete">×</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

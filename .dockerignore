@@ -2,3 +2,11 @@
 **/__pycache__
 data
 .git
+.venv
+tests
+.env.example
+.gitignore
+.dockerignore
+fly.toml
+Dockerfile
+docker-compose.yml

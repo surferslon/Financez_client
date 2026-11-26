@@ -2,15 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#fafafa">
     <title>Financez</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <main>
         <h1>FINANCEZ</h1>
+        {% if g.user %}
+        <form method="post" action="{{ url_for('web.logout') }}" class="user">
+            <input type="hidden" name="csrf" value="{{ session.csrf }}">
+            <span>{{ g.user.username }}</span>
+            <button>Log out</button>
+        </form>
+        {% endif %}
         {% for message in get_flashed_messages() %}<p class="message">{{ message }}</p>{% endfor %}
         {% block content %}{% endblock %}
     </main>
+    {% if g.user %}
+    <nav class="tabs">
+        <a href="{{ url_for('web.index') }}" {% if request.endpoint == "web.index" %}aria-current="page"{% endif %}>Main</a>
+        <a href="{{ url_for('web.queue') }}" {% if request.endpoint == "web.queue" %}aria-current="page"{% endif %}>Queue{% if queue_size %} <span class="badge">{{ queue_size }}</span>{% endif %}</a>
+    </nav>
+    {% endif %}
 </body>
 </html>

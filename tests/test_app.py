@@ -41,6 +41,7 @@ class ClientTests(unittest.TestCase):
 
     def test_requires_auth(self):
         self.assertEqual(self.client.get("/").status_code, 302)
+        self.assertEqual(self.client.get("/queue").status_code, 302)
         self.assertEqual(self.client.post("/entries", data=ENTRY).status_code, 302)
         self.assertEqual(self.client.get("/api/users/alice/entries").status_code, 401)
         self.assertEqual(self.client.get("/api/users/alice/entries", headers={"Authorization": "Bearer nope"}).status_code, 401)
@@ -61,7 +62,7 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(self.pending("bob"), [])
         self.client.post("/api/users/bob/entries/delete", json={"ids": [entry["id"]]}, headers=AUTH)
         csrf = self.login("bob")
-        self.assertNotIn(b"lunch", self.client.get("/").data)
+        self.assertNotIn(b"lunch", self.client.get("/queue").data)
         self.client.post(f"/entries/{entry['id']}/delete", data={"csrf": csrf})
         self.assertEqual(len(self.pending("alice")), 1)
 
@@ -75,7 +76,8 @@ class ClientTests(unittest.TestCase):
         self.client.post("/entries", data={**ENTRY, "csrf": csrf})
         (entry,) = self.pending()
         self.assertEqual((entry["acc_dr"], entry["acc_cr"], entry["total"]), (2, 1, "12.50"))
-        self.assertIn(b"lunch", self.client.get("/").data)
+        self.assertIn(b"lunch", self.client.get("/queue").data)
+        self.assertNotIn(b"lunch", self.client.get("/").data)
         self.client.post("/api/users/alice/entries/delete", json={"ids": [entry["id"]]}, headers=AUTH)
         self.assertEqual(self.pending(), [])
 

@@ -60,17 +60,27 @@ def logout():
 @web.get("/")
 @login_required
 def index():
-    pending = current_app.extensions["entries"].pending(g.user.username)
     return render_template(
         "index.html",
         user=g.user,
         tree=g.user.account_tree(),
         currencies=g.user.currencies,
-        entries=pending[::-1],
-        account_names={account["id"]: account["name"] for account in g.user.accounts},
-        currency_names={currency["id"]: currency["name"] for currency in g.user.currencies},
+        queue_size=len(current_app.extensions["entries"].pending(g.user.username)),
         today=date.today().isoformat(),
         last=session.get("last", {}),
+    )
+
+
+@web.get("/queue")
+@login_required
+def queue():
+    pending = current_app.extensions["entries"].pending(g.user.username)
+    return render_template(
+        "queue.html",
+        entries=pending[::-1],
+        queue_size=len(pending),
+        account_names={account["id"]: account["name"] for account in g.user.accounts},
+        currency_names={currency["id"]: currency["name"] for currency in g.user.currencies},
     )
 
 
@@ -92,4 +102,4 @@ def create_entry():
 @login_required
 def delete_entry(entry_id):
     current_app.extensions["entries"].remove(g.user.username, [entry_id])
-    return redirect(url_for("web.index"))
+    return redirect(url_for("web.queue"))
