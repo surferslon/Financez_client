@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% macro account_picker(name, label) %}
+<details class="picker">
+    <summary>{{ label }}: <span class="picked">—</span></summary>
+    {% for group, nodes in tree.items() %}
+    <h3>{{ group }}</h3>
+    <ul class="tree">
+        {% for node in nodes recursive %}
+        <li>
+            <label><input type="radio" name="{{ name }}" value="{{ node.id }}" required {% if last.get(name) == node.id %}checked{% endif %}><span>{{ node.name }}</span></label>
+            {% if node.children %}<ul>{{ loop(node.children) }}</ul>{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+</details>
+{% endmacro %}
+
+{% block content %}
+<form method="post" action="{{ url_for('web.logout') }}" class="user">
+    <input type="hidden" name="csrf" value="{{ session.csrf }}">
+    <span>{{ user.username }}</span>
+    <button>Log out</button>
+</form>
+{% if not tree or not currencies %}
+<p>No accounts yet. Add accounts in Financez, then open its main page to sync them.</p>
+{% else %}
+<form method="post" action="{{ url_for('web.create_entry') }}">
+    <input type="hidden" name="csrf" value="{{ session.csrf }}">
+    <label>Date <input type="date" name="date" id="date" value="{{ today }}" required></label>
+    {{ account_picker("acc_dr", "DR") }}
+    {{ account_picker("acc_cr", "CR") }}
+    <label>Sum <input name="total" inputmode="decimal" autocomplete="off" required></label>
+    <label>Currency
+        <select name="currency" required>
+            {% for cur in currencies %}
+            <option value="{{ cur.id }}" {% if cur.id == last.get("currency") or (not last.get("currency") and cur.selected) %}selected{% endif %}>{{ cur.name }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Comment <input name="comment" maxlength="1024"></label>
+    <button>Add</button>
+</form>
+<script>
+    // The server may be in another timezone: use the date of this device.
+    const now = new Date();
+    document.getElementById("date").value = new Date(now - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+
+    for (const picker of document.querySelectorAll(".picker")) {
+        const show = () => {
+            const checked = picker.querySelector("input:checked");
+            if (checked) picker.querySelector(".picked").textContent = checked.nextElementSibling.textContent;
+        };
+        picker.addEventListener("change", () => { show(); picker.open = false; });
+        // A missing choice can only be pointed out by the browser if the tree is open
+        picker.addEventListener("invalid", () => { picker.open = true; }, true);
+        show();
+    }
+</script>
+{% endif %}
+
+<h2>Waiting for sync ({{ entries|length }})</h2>
+<ul>
+    {% for entry in entries %}
+    <li>
+        <div>
+            <strong>{{ entry.total }} {{ currency_names.get(entry.currency, "?") }}</strong> · {{ entry.date }}<br>
+            {{ account_names.get(entry.acc_dr, "deleted account") }} ← {{ account_names.get(entry.acc_cr, "deleted account") }}
+            {% if entry.comment %}<br><small>{{ entry.comment }}</small>{% endif %}
+        </div>
+        <form method="post" action="{{ url_for('web.delete_entry', entry_id=entry.id) }}" onsubmit="return confirm('Delete this entry?')">
+            <input type="hidden" name="csrf" value="{{ session.csrf }}">
+            <button aria-label="Delete">×</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<form method="post">
+    <p>Use your Financez login.</p>
+    <label>Username <input name="username" autocomplete="username" autocapitalize="none" required autofocus></label>
+    <label>Password <input type="password" name="password" autocomplete="current-password" required></label>
+    <button>Log in</button>
+</form>
+{% endblock %}

@@ -1,0 +1,24 @@
+html { font-family: monospace; color: #2f2f2f; }
+body { background: #fafafa; margin: 0; }
+main { max-width: 480px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 18px; }
+h2 { font-size: 14px; margin-top: 32px; }
+label { display: block; margin-bottom: 10px; }
+input, select, button { box-sizing: border-box; font: inherit; font-size: 16px; min-height: 40px; }
+input, select { display: block; width: 100%; margin-top: 4px; padding: 0 8px; background: #fff; border: 1px solid #dbdbdb; }
+button { background: #6089c8; color: #fff; border: none; cursor: pointer; padding: 0 16px; }
+form > button { width: 100%; }
+ul { list-style: none; padding: 0; }
+main > ul > li { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px; background: #fff; border: 1px solid #dbdbdb; margin-bottom: -1px; overflow-wrap: anywhere; }
+main > ul > li form button { width: auto; }
+.message { background: #fff; border: 1px solid #dbdbdb; padding: 8px; }
+.user { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.user button { width: auto; }
+.picker { background: #fff; border: 1px solid #dbdbdb; margin-bottom: 10px; }
+.picker summary { min-height: 40px; line-height: 40px; padding: 0 8px; font-size: 16px; cursor: pointer; }
+.picker h3 { font-size: 13px; margin: 8px; border-bottom: 1px solid #dbdbdb; }
+.tree, .tree ul { margin: 0; padding-left: 8px; }
+.tree ul { margin-left: 11px; border-left: 1px solid #dbdbdb; }
+.tree label { display: flex; align-items: center; gap: 8px; min-height: 36px; margin: 0; cursor: pointer; font-size: 14px; }
+.tree input { width: auto; min-height: 0; margin: 0; }
+.tree input:checked + span { font-weight: bold; color: #6089c8; }
